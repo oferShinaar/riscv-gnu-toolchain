@@ -1,6 +1,8 @@
 srcdir := @abs_top_srcdir@
 builddir := @abs_top_builddir@
 INSTALL_DIR := @prefix@
+SRC_EXPAT := @abs_top_srcdir@/libexpat/expat
+OBJDIR = obj
 
 # We need a relative source dir for the gcc configure, to make msys2 mingw64
 # builds work.  Mayberelsrcdir is relative if a relative path was used to run
@@ -21,12 +23,14 @@ newlib_url := ftp://sourceware.org/pub/newlib/newlib-$(newlib_version).tar.gz
 
 WITH_ARCH ?= @WITH_ARCH@
 WITH_ABI ?= @WITH_ABI@
+WITH_HOST ?= @configure_host@
 SYSROOT := $(INSTALL_DIR)/sysroot
 
 SHELL := /bin/sh
 AWK := @GAWK@
 SED := @GSED@
 PATH := $(INSTALL_DIR)/bin:$(PATH)
+EXPAT_PATHS := $(INSTALL_DIR):$(INSTALL_DIR)/include:$(INSTALL_DIR)/lib
 
 # Check to see if we need wrapper scripts for awk/sed (which point to
 # gawk/gsed on platforms where these aren't the default), otherwise
@@ -81,7 +85,8 @@ MUSL_CXX_FOR_TARGET ?= $(MUSL_TUPLE)-g++
 CONFIGURE_HOST   = @configure_host@
 
 all: @default_target@
-newlib: stamps/build-gcc-newlib-stage2
+#newlib: $(OBJDIR)/stamps/expat/install.stamp
+newlib: $(OBJDIR)/stamps/expat/install.stamp stamps/build-gcc-newlib-stage2 
 linux: stamps/build-gcc-linux-stage2
 musl: stamps/build-gcc-musl-stage2
 ifeq (@enable_gdb@,--enable-gdb)
@@ -165,6 +170,38 @@ $(addprefix $(srcdir)/patches/,$(PACKAGES)): $(srcdir)/patches/%: src/%
 
 patches: $(addprefix $(srcdir)/patches/,$(PACKAGES))
 
+
+$(WIN64)-expat-configure  := --host=$(WIN64)
+
+# OpenOCD requires a GDB that's been build with expat support so it can read
+# the target XML files.
+$(OBJDIR)/stamps/expat/install.stamp: \
+		$(OBJDIR)/build/expat/configure
+	$(info "-------------------------- Expat phase 2--------------------------")
+	$(eval $@_TARGET := $(patsubst $(OBJDIR)/%/stamps/expat/install.stamp,%,$@))
+	$(eval $@_BUILD := $(patsubst %/stamps/expat/install.stamp,%/build/expat,$@))
+	$(eval $@_INSTALL := $(patsubst %/stamps/expat/install.stamp,%/install/riscv64-unknown-elf-gcc-$(RGT_VERSION)-$($@_TARGET),$@))
+	$(eval $@HOST := $(patsubst --with-host=%,%,$(WITH_HOST)))
+	mkdir -p $($@_BUILD)
+	#cd $($@_BUILD); ./configure --prefix=$(abspath $($@_INSTALL)) $($($@_TARGET)-expat-configure)
+	cd $($@_BUILD); ./configure --prefix=$(INSTALL_DIR) $($($@_TARGET)-expat-configure) $($@HOST)
+
+	#$(MAKE) -C $($@_BUILD) buildlib
+	#$(MAKE) -C $($@_BUILD) installlib
+	$(MAKE) -C $($@_BUILD) 
+	$(MAKE) -C $($@_BUILD) install
+	mkdir -p $(dir $@)
+	date > $@
+	$(info "-------------------------- Expat phase 3 install--------------------------")
+	
+$(OBJDIR)/build/expat/configure:
+	$(info "-------------------------- Expat phase 1 build/expat/configure --------------------------")
+	$(eval export PATH=$(PATH):$(EXPAT_PATHS))	
+	rm -rf $(dir $@)
+	mkdir -p $(dir $@)
+	cp -a $(SRC_EXPAT)/* $(dir $@)
+	cd $(dir $@); ./buildconf.sh
+	touch -c $@
 
 stamps/build-linux-headers:
 	mkdir -p $(SYSROOT)/usr/
