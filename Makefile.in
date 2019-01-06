@@ -86,7 +86,7 @@ CONFIGURE_HOST   = @configure_host@
 
 all: @default_target@
 #newlib: $(OBJDIR)/stamps/expat/install.stamp
-newlib: $(OBJDIR)/stamps/expat/install.stamp stamps/build-gcc-newlib-stage2 
+newlib: stamps/riscv-gcc-gmp $(OBJDIR)/stamps/expat/install.stamp stamps/build-gcc-newlib-stage2 
 linux: stamps/build-gcc-linux-stage2
 musl: stamps/build-gcc-musl-stage2
 ifeq (@enable_gdb@,--enable-gdb)
@@ -202,6 +202,13 @@ $(OBJDIR)/build/expat/configure:
 	cp -a $(SRC_EXPAT)/* $(dir $@)
 	cd $(dir $@); ./buildconf.sh
 	touch -c $@
+
+
+stamps/riscv-gcc-gmp:	
+	$(info "-------------------------- download contrib prerequisites --------------------------")
+	cd $(srcdir)/riscv-gcc/; ./contrib/download_prerequisites
+
+
 
 stamps/build-linux-headers:
 	mkdir -p $(SYSROOT)/usr/
