@@ -117,14 +117,15 @@ Following are the steps need to be taking when building cross toolchain for Wino
 Prerequisites:
 If you don’t have gcc on your machine (at all) then get it with "apt-get install gcc"
 
-	1) Create Linux GCC for target RV
-		a. create temp dir, from temp dir run the configure on the toolchain src. Note all paths are realtive : 
-		./configure --with-arch=rv64imafdc --with-abi=lp64d --enable-multilib --prefix=<Path-to-build-output>
-		b. Make
-		c. Do clean if needed. For both make and configure
-	2) Create Windows GCC of RV (windows host)
-		a. add to the PATH the linux build we did in -1-: Export PATH=$PATH:<Path-to-build-output>/bin
-		b. From temp dir 
-		./configure --with-arch=rv64imafdc --with-abi=lp64d --enable-multilib --without-system-zlib --with-cmodel=medany --with-host=x86_64-w64-mingw32 --prefix=<Path-to-win-build>
-		c. Make
+for the following parameters:
+    --with-arch=rv64imafdc 
+    --with-abi=lp64d 
+    --enable-multilib 
+    --without-system-zlib 
+    --with-cmodel=medany 
+    --with-host=x86_64-w64-mingw32
+
+use the build script provided in the source folder:
+
+    ./build.sh <Path-to-build-output> <Path-to-win-build>
 
