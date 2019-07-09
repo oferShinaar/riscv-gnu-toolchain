@@ -128,4 +128,12 @@ for the following parameters:
 use the build script provided in the source folder:
 
     ./build.sh <Path-to-build-output> <Path-to-win-build>
+    
+# GCC Release notes
+- #### RISCV GCC 8.2
+	- Initial RISCV official 8.2 GCC release
+- #### RISCV GCC 8.3
+	- RISCV official 8.3 GCC release
+	- GDB fix for skipping breakpoint at fist line after ASM lable
+	- lto simple_object fix opening mode in windows (text->bin)
 
