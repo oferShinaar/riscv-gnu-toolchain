@@ -1,0 +1,23 @@
+#
+# Upstream regression, PR 86153.
+#
+FAIL: g++.dg/pr83239.C
+#
+# Check for nop insns fails due to ".option nopic".
+#
+FAIL: c-c++-common/patchable_function_entry-decl.c
+FAIL: c-c++-common/patchable_function_entry-default.c
+FAIL: c-c++-common/patchable_function_entry-definition.c
+#
+# XXX: Need review.
+#
+XPASS: gcc.dg/attr-alloc_size-11.c
+#
+# We didn't define TARGET_HAVE_SPECULATION_SAFE_VALUE or
+# speculation_barrier pattern
+#
+FAIL: c-c++-common/spec-barrier-1.c
+#
+# XXX: Need review.
+#
+FAIL: gcc.dg/debug/dwarf2/inline5.c
