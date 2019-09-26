@@ -13,9 +13,6 @@
 [submodule "riscv-newlib"]
 	path = riscv-newlib
 	url = https://github.com/riscv/riscv-newlib.git
-[submodule "riscv-qemu"]
-	path = riscv-qemu
-	url = https://github.com/riscv/riscv-qemu.git
 [submodule "riscv-gdb"]
 	path = riscv-gdb
 	url = https://github.com/nidalf/riscv-binutils-gdb.git
